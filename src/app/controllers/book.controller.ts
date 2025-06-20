@@ -27,13 +27,15 @@ booksRoutes.get("/", async (req: Request, res: Response) => {
     const { filter, sortBy, sort, limit } = req.query;
     // console.log({ filter, sortBy, sort, limit });
 
-    let books = [];
+    let search: any;
+    filter ? (search = { genre: filter }) : (search = {});
 
-    if (!filter) {
-      books = await Book.find({});
-    } else {
-      books = await Book.find({ genre: filter });
+    let limitValue: any = 10;
+    if (limit) {
+      limitValue = limit;
     }
+
+    const books = await Book.find(search).limit(limitValue);
 
     res.status(201).json({
       success: true,

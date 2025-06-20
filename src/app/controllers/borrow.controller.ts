@@ -52,8 +52,28 @@ borrowBooksRoutes.get("/", async (req: Request, res: Response) => {
       {
         $group: {
           _id: "$book",
-          totalQuantity: { $sum: 1 },
-          fullDoc: { $push: "$$ROOT" },
+          totalQuantity: { $sum: "$quantity" },
+        },
+      },
+      {
+        $lookup: {
+          from: "books",
+          localField: "_id",
+          foreignField: "_id",
+          as: "books",
+        },
+      },
+      {
+        $unwind: "$books",
+      },
+      {
+        $project: {
+          _id: 0,
+          book: {
+            title: "$books.title",
+            isbn: "$books.isbn",
+          },
+          totalQuantity: 1,
         },
       },
     ]);
@@ -62,7 +82,7 @@ borrowBooksRoutes.get("/", async (req: Request, res: Response) => {
 
     res.status(201).json({
       success: true,
-      message: "Borrow Books retrieved successfully",
+      message: "Borrowed books summary retrieved successfully",
       data: aggregateBorrowedBooks,
     });
   } catch (error: any) {

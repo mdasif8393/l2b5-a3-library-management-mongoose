@@ -9,6 +9,24 @@ borrowBooksRoutes.post("/", async (req: Request, res: Response) => {
     const body = req.body;
 
     const book = await Book.findById(body.book);
+    if (!book) {
+      res.status(400).json({
+        success: false,
+        message: "This book is not available",
+      });
+    }
+    if (body?.quantity > book?.copies!) {
+      res.status(400).json({
+        success: false,
+        message: "There is not enough books to borrow",
+      });
+    }
+
+    if (body?.quantity <= book?.copies!) {
+      await Book.findByIdAndUpdate(body?.book, {
+        $inc: { copies: -body?.quantity },
+      });
+    }
 
     await BorrowBooks.makeBookAvailabilityFalse(book?._id);
 

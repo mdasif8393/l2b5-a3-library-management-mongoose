@@ -27,6 +27,26 @@ const borrowBooksSchema = new Schema<IBorrowBooks, IBorrowBooksStatic>(
   }
 );
 
+// pre book
+borrowBooksSchema.pre("save", async function async(next) {
+  const book = await Book.findById(this?.book);
+  // if book not available in database show error
+  if (!book) {
+    throw new Error("Book is not found");
+  }
+  // if borrow books quantify is more than available books quantity show error
+  if (this?.quantity > book?.copies!) {
+    throw new Error("There is not enough books to borrow");
+  }
+  // reduce book copies
+  if (this?.quantity <= book?.copies!) {
+    await Book.findByIdAndUpdate(this?.book, {
+      $inc: { copies: -this?.quantity },
+    });
+  }
+  next();
+});
+
 borrowBooksSchema.static("makeBookAvailabilityFalse", async function (bookId) {
   const book = await Book.findById(bookId);
 

@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { BorrowBooks } from "../models/borrow.mode";
 import { Book } from "../models/book.model";
+import { Types } from "mongoose";
 
 export const borrowBooksRoutes = express.Router();
 
@@ -28,7 +29,7 @@ borrowBooksRoutes.post("/", async (req: Request, res: Response) => {
       });
     }
 
-    await BorrowBooks.makeBookAvailabilityFalse(book?._id);
+    await BorrowBooks.makeBookAvailabilityFalse(book?._id as Types.ObjectId);
 
     const borrowBooks = await BorrowBooks.create(body);
 

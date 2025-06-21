@@ -47,12 +47,18 @@ const borrowBooksSchema = new Schema<IBorrowBooks, IBorrowBooksStatic>(
 //   next();
 // });
 
-borrowBooksSchema.static("makeBookAvailabilityFalse", async function (bookId) {
-  const book = await Book.findById(bookId);
+borrowBooksSchema.static(
+  "makeBookAvailabilityFalse",
+  async function (bookId: string) {
+    const book = await Book.findById(bookId);
 
-  if (book?.copies === 0) {
-    await Book.findByIdAndUpdate(bookId, { available: false });
+    if (book?.copies === 0) {
+      await Book.findByIdAndUpdate(bookId, { available: false });
+    }
   }
-});
+);
 
-export const BorrowBooks = model("Borrow", borrowBooksSchema);
+export const BorrowBooks = model<IBorrowBooks, IBorrowBooksStatic>(
+  "Borrow",
+  borrowBooksSchema
+);

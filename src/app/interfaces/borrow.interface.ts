@@ -7,5 +7,5 @@ export interface IBorrowBooks {
 }
 
 export interface IBorrowBooksStatic extends Model<IBorrowBooks> {
-  makeBookAvailabilityFalse(bookId: Types.ObjectId): void;
+  makeBookAvailabilityFalse(bookId: Types.ObjectId): Promise<void>;
 }
